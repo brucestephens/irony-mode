@@ -308,6 +308,15 @@ for this path."
       (when cc-file
 	(irony-cdb-load-clang-complete cc-file)))))
 
+(defun irony-cdb-try-load-rc ()
+  (when buffer-file-name
+    (let ((out (process-lines "rc" "--get-compile"
+                              buffer-file-name)))
+      (if (equal (car out) "0")
+          (irony-cdb-store-entry
+           (list buffer-file-name default-directory (cadr out)))
+        nil))))
+
 (defun irony-compilation-db-setup ()
   "Irony-mode hook for irony-cdb plugin."
   (when (and buffer-file-name
@@ -319,6 +328,8 @@ for this path."
      ;; try load flags for this file if an entry is in compilation db
      ;; first
      (irony-cdb-try-load-from-cache)
+     ;; then try using rc --get-compile
+     (irony-cdb-try-load-rc)
      ;; then try to look for a .clang_complete that has already been
      ;; loaded once
      (irony-cdb-try-load-clang-complete))))
