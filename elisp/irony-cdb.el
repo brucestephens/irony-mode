@@ -314,7 +314,9 @@ for this path."
                               buffer-file-name)))
       (if (equal (car out) "0")
           (irony-cdb-store-entry
-           (list buffer-file-name default-directory (cadr out)))
+           `((file . ,buffer-file-name)
+             (directory . ,default-directory)
+             (command . ,(cadr out))))
         nil))))
 
 (defun irony-compilation-db-setup ()
