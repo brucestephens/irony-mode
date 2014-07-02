@@ -310,14 +310,16 @@ for this path."
 
 (defun irony-cdb-try-load-rc ()
   (when buffer-file-name
-    (let ((out (process-lines "rc" "--get-compile"
-                              buffer-file-name)))
-      (if (equal (car out) "0")
-          (irony-cdb-store-entry
-           `((file . ,buffer-file-name)
-             (directory . ,default-directory)
-             (command . ,(cadr out))))
-        nil))))
+    (condition-case nil
+        (let ((out (process-lines "rc" "--get-compile"
+                                  buffer-file-name)))
+          (if (equal (car out) "0")
+              (irony-cdb-store-entry
+               `((file . ,buffer-file-name)
+                 (directory . ,default-directory)
+                 (command . ,(cadr out))))
+            nil))
+      (error nil))))
 
 (defun irony-compilation-db-setup ()
   "Irony-mode hook for irony-cdb plugin."
